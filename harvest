@@ -1,0 +1,16 @@
+#!/bin/bash
+
+MUSICDIR="$HOME/musica"
+
+tagit() {
+  while read line; do
+    echo LINE = $line
+  done
+}
+
+tagdir() {
+  test -n $1 || exit 1
+  find $1 -type f -exec ./tagsync {} +
+}
+
+tagdir $MUSICDIR

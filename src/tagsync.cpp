@@ -12,44 +12,52 @@ static const Json::StaticString ALBUM("album");
 static const Json::StaticString TRACK("track");
 static const Json::StaticString YEAR("year");
 
-void parseAndWrite(const char* location, Json::StreamWriter* const writer)
+bool parseAndWrite(const char* location, Json::Writer& writer)
 {
   Json::Value metadata;
   metadata[LOCATION] = location;
   TagLib::FileRef f(location);
-  TagLib::Tag* tag = f.tag();
-  TagLib::String artist = tag->artist();
-  TagLib::String album = tag->artist();
-  TagLib::String title = tag->title();
 
-  uint track = tag->track();
-  uint year = tag->year();
+  if (f.isNull()){
+    return false;
+  }
 
-  metadata[TITLE] = title.toCString(true);
-  metadata[ARTIST] = artist.toCString(true);
-  metadata[ALBUM] = album.toCString(true);
-  metadata[TRACK] = track;
-  metadata[YEAR] = year;
+  if (f.tag() && !f.tag()->isEmpty()){
+    TagLib::Tag* tag = f.tag();
+    TagLib::String artist = tag->artist();
+    TagLib::String album = tag->artist();
+    TagLib::String title = tag->title();
 
-  writer->write(metadata, &std::cout);
+    uint track = tag->track();
+    uint year = tag->year();
 
+    metadata[TITLE] = title.toCString(true);
+    metadata[ARTIST] = artist.toCString(true);
+    metadata[ALBUM] = album.toCString(true);
+    metadata[TRACK] = track;
+    metadata[YEAR] = year;
+  }
+
+  std::cout << writer.write(metadata);
+  return true;
 }
 
 int main(int argc, const char** argv)
 {
-  Json::StreamWriterBuilder factory;
+  //Json::StreamWriterBuilder factory;
   //std::unique_ptr<Json::StreamWriter> const writer(factory.newStreamWriter());
-  Json::StreamWriter* const writer(factory.newStreamWriter());
+  //Json::StreamWriter* const writer(factory.newStreamWriter());
+  Json::FastWriter writer;
 
-  std::cout << "[";
+  //std::cout << "[";
   for (int i=1; i<argc-1; i++){
     parseAndWrite(argv[i], writer);
-    std::cout << "," << std::endl;
+    //std::cout << "," << std::endl;
   }
   if (argc > 1){
     parseAndWrite(argv[argc - 1], writer);
   }
-  std::cout << "]" << std::endl;
+  //std::cout << "]" << std::endl;
 
   return 0;
 }

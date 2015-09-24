@@ -1,0 +1,8 @@
+#!/bin/bash
+#
+#Imports metadata to mongo.
+#Usage:
+#
+#upload <file.json>
+
+mongoimport -d media -c metadata --upsertFields location $1
